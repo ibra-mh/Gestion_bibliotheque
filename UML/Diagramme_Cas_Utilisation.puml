@@ -1,0 +1,20 @@
+@startuml Diagramme_Cas_Utilisation
+
+actor "Bibliothécaire" as Bibliothecaire
+actor "Utilisateur" as Utilisateur
+
+rectangle "Système Gestion Bibliothèque" {
+    Bibliothecaire --> (Ajouter un document)
+    Bibliothecaire --> (Ajouter un utilisateur)
+    Bibliothecaire --> (Afficher tous les documents)
+    Bibliothecaire --> (Afficher tous les utilisateurs)
+    Bibliothecaire --> (Rechercher un document)
+    Bibliothecaire --> (Afficher tous les emprunts)
+    
+    Utilisateur --> (Emprunter un document)
+    Utilisateur --> (Retourner un document)
+    Utilisateur --> (Afficher ses emprunts)
+    Utilisateur --> (Rechercher un document)
+}
+
+@enduml

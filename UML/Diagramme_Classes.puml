@@ -1,0 +1,173 @@
+@startuml Diagramme_Classes
+
+' Enums
+enum Statut <<Document.Statut>> {
+    DISPONIBLE
+    EMPRUNTE
+}
+
+enum Niveau <<Memoire.Niveau>> {
+    LICENCE
+    MASTER
+    DOCTORAT
+}
+
+' Classes abstraites
+abstract class Document {
+    - id: String
+    - titre: String
+    - auteur: String
+    - anneePublication: int
+    - statut: Statut
+    + getId(): String
+    + setId(id: String): void
+    + getTitre(): String
+    + setTitre(titre: String): void
+    + getAuteur(): String
+    + setAuteur(auteur: String): void
+    + getAnneePublication(): int
+    + setAnneePublication(anneePublication: int): void
+    + getStatut(): Statut
+    + setStatut(statut: Statut): void
+    + isDisponible(): boolean
+    + {abstract} afficher(): void
+    + toString(): String
+}
+
+abstract class Utilisateur {
+    - id: String
+    - nom: String
+    - email: String
+    + getId(): String
+    + setId(id: String): void
+    + getNom(): String
+    + setNom(nom: String): void
+    + getEmail(): String
+    + setEmail(email: String): void
+    + {abstract} afficher(): void
+    + toString(): String
+}
+
+' Classes Document filles
+class Livre {
+    - nombreDePages: int
+    - genre: String
+    + afficher(): void
+    + toString(): String
+}
+
+class Magazine {
+    - numeroEdition: int
+    - moisPublication: String
+    + afficher(): void
+    + toString(): String
+}
+
+class Memoire {
+    - niveau: Niveau
+    - encadrant: String
+    + afficher(): void
+    + toString(): String
+}
+
+' Classes Utilisateur filles
+class Etudiant {
+    - filiere: String
+    - niveau: String
+    + afficher(): void
+    + toString(): String
+}
+
+class Enseignant {
+    - departement: String
+    - specialite: String
+    + afficher(): void
+    + toString(): String
+}
+
+' Classes services
+class Emprunt {
+    - utilisateur: Utilisateur
+    - document: Document
+    - dateEmprunt: LocalDate
+    - dateRetourPrevue: LocalDate
+}
+
+class BibliothequeService {
+    - documents: Gestionnaire<Document>
+    - utilisateurs: Gestionnaire<Utilisateur>
+    - emprunts: ArrayList<Emprunt>
+    - emails: HashSet<String>
+    + ajouterDocument(document: Document): void
+    + ajouterUtilisateur(utilisateur: Utilisateur): void
+    + trouverDocument(id: String): Document
+    + trouverUtilisateur(id: String): Utilisateur
+    + rechercherDocumentsParTitre(titre: String): ArrayList<Document>
+    + emprunter(idUtilisateur: String, idDocument: String, dateRetourPrevue: LocalDate): Emprunt
+    + retourner(idDocument: String): void
+    + getEmpruntsUtilisateur(idUtilisateur: String): ArrayList<Emprunt>
+}
+
+class "Gestionnaire<T>" as Gestionnaire {
+    - elements: ArrayList<T>
+    - extracteurId: Function<T, String>
+    + add(element: T): void
+    + remove(element: T): boolean
+    + getAll(): ArrayList<T>
+    + findById(id: String): Optional<T>
+}
+
+class MenuConsole {
+    - service: BibliothequeService
+    - scanner: Scanner
+    + demarrer(): void
+}
+
+class Main {
+    + {static} main(args: String[]): void
+}
+
+' Exceptions
+class DocumentIndisponibleException
+class DocumentIntrouvableException
+class UtilisateurIntrouvableException
+class EmpruntImpossibleException
+class EmailDejaExisteException
+class IdDejaExisteException
+
+Exception <|-- DocumentIndisponibleException
+Exception <|-- DocumentIntrouvableException
+Exception <|-- UtilisateurIntrouvableException
+Exception <|-- EmpruntImpossibleException
+Exception <|-- EmailDejaExisteException
+Exception <|-- IdDejaExisteException
+
+' Héritage
+Document <|-- Livre
+Document <|-- Magazine
+Document <|-- Memoire
+
+Utilisateur <|-- Etudiant
+Utilisateur <|-- Enseignant
+
+' Associations
+Document --> Statut
+Memoire --> Niveau
+
+Emprunt "*" --> "1" Utilisateur
+Emprunt "*" --> "1" Document
+
+BibliothequeService "1" *-- "2" Gestionnaire
+BibliothequeService "1" *-- "*" Emprunt
+
+MenuConsole --> BibliothequeService
+Main ..> MenuConsole
+
+BibliothequeService ..> DocumentIndisponibleException : throws
+BibliothequeService ..> DocumentIntrouvableException : throws
+BibliothequeService ..> UtilisateurIntrouvableException : throws
+BibliothequeService ..> EmpruntImpossibleException : throws
+BibliothequeService ..> EmailDejaExisteException : throws
+BibliothequeService ..> IdDejaExisteException : throws
+
+@enduml
